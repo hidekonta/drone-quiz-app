@@ -103,6 +103,12 @@ export default function Home() {
         {!showResult ? (
           <>
             <div className="rounded-2xl border border-white/10 bg-slate-900/70 p-4 sm:p-6">
+              <div className="mb-3 flex items-center justify-between gap-4 text-sm text-slate-300">
+                <span className="rounded-full bg-emerald-500/10 px-3 py-1 font-semibold text-emerald-200">
+                  分野: {currentQuestion.category}
+                </span>
+                <span className="font-medium">問題 {currentIndex + 1} / {questions.length}</span>
+              </div>
               <p className="mb-4 text-lg font-semibold text-white">{currentQuestion.question}</p>
               <div className="space-y-3">
                 {currentQuestion.options.map((option, index) => {
