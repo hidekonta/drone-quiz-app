@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import questionsData from './data/questions.ultimate.json';
 
 function shuffleArray(array) {
@@ -19,8 +19,9 @@ export default function Home() {
   const [answered, setAnswered] = useState(false);
   const [showResult, setShowResult] = useState(false);
   const [quizKey, setQuizKey] = useState(0);
+  const [questions, setQuestions] = useState([]);
 
-  const questions = useMemo(() => {
+  useEffect(() => {
     const QUESTIONS_PER_SESSION = 20;
     const categories = Array.from(new Set(questionsData.map((q) => q.category))).sort();
     const questionsByCategory = categories.reduce((acc, category) => {
@@ -54,10 +55,10 @@ export default function Home() {
       };
     });
 
-    return shuffleArray(prepared);
+    setQuestions(shuffleArray(prepared));
   }, [quizKey]);
 
-  const currentQuestion = useMemo(() => questions[currentIndex], [questions, currentIndex]);
+  const currentQuestion = questions[currentIndex];
 
   const handleAnswer = (optionIndex) => {
     if (answered || !currentQuestion) return;
@@ -96,16 +97,20 @@ export default function Home() {
             <h1 className="mt-1 text-2xl font-bold text-white sm:text-3xl">二等無人航空機操縦士 学科試験練習</h1>
           </div>
           <div className="rounded-full bg-emerald-500/20 px-3 py-1 text-sm text-emerald-200">
-            {currentIndex + 1}/{questions.length}
+            {questions.length > 0 ? `${currentIndex + 1}/${questions.length}` : 'Loading...'}
           </div>
         </div>
 
-        {!showResult ? (
+        {questions.length === 0 ? (
+          <div className="rounded-2xl border border-white/10 bg-slate-900/70 p-10 text-center text-white/80">
+            問題を読み込んでいます…
+          </div>
+        ) : !showResult ? (
           <>
             <div className="rounded-2xl border border-white/10 bg-slate-900/70 p-4 sm:p-6">
               <div className="mb-3 flex items-center justify-between gap-4 text-sm text-slate-300">
                 <span className="rounded-full bg-emerald-500/10 px-3 py-1 font-semibold text-emerald-200">
-                  分野: {currentQuestion.category}
+                  分野: {currentQuestion?.category}
                 </span>
                 <span className="font-medium">問題 {currentIndex + 1} / {questions.length}</span>
               </div>
