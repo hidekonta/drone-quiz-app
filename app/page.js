@@ -3,13 +3,40 @@
 import { useMemo, useState } from 'react';
 import questionsData from './data/questions.ultimate.json';
 
+function shuffleArray(array) {
+  const copy = [...array];
+  for (let i = copy.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
 export default function Home() {
-  const questions = questionsData;
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
   const [score, setScore] = useState(0);
   const [answered, setAnswered] = useState(false);
   const [showResult, setShowResult] = useState(false);
+
+  const questions = useMemo(() => {
+    const QUESTIONS_PER_SESSION = 20;
+    const categories = Array.from(new Set(questionsData.map((q) => q.category))).sort();
+    const questionsByCategory = categories.reduce((acc, category) => {
+      acc[category] = shuffleArray(questionsData.filter((q) => q.category === category));
+      return acc;
+    }, {});
+
+    const baseCount = Math.floor(QUESTIONS_PER_SESSION / categories.length);
+    const remainder = QUESTIONS_PER_SESSION % categories.length;
+
+    const selected = categories.flatMap((category, index) => {
+      const count = baseCount + (index < remainder ? 1 : 0);
+      return questionsByCategory[category].slice(0, count);
+    });
+
+    return shuffleArray(selected);
+  }, []);
 
   const currentQuestion = useMemo(() => questions[currentIndex], [questions, currentIndex]);
 
