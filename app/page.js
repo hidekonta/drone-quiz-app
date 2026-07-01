@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import questionsData from './data/questions.enhanced.json';
+import questionsData from './data/questions.ultimate.json';
 
 export default function Home() {
   const questions = questionsData;
