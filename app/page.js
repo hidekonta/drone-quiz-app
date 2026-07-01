@@ -18,6 +18,7 @@ export default function Home() {
   const [score, setScore] = useState(0);
   const [answered, setAnswered] = useState(false);
   const [showResult, setShowResult] = useState(false);
+  const [quizKey, setQuizKey] = useState(0);
 
   const questions = useMemo(() => {
     const QUESTIONS_PER_SESSION = 20;
@@ -35,8 +36,26 @@ export default function Home() {
       return questionsByCategory[category].slice(0, count);
     });
 
-    return shuffleArray(selected);
-  }, []);
+    const prepared = selected.map((question) => {
+      const originalAnswerIndex = question.answer;
+      const optionsWithIndex = question.options.map((option, index) => ({
+        option,
+        index,
+      }));
+      const shuffledOptions = shuffleArray(optionsWithIndex);
+      const shuffledAnswerIndex = shuffledOptions.findIndex(
+        (item) => item.index === originalAnswerIndex
+      );
+
+      return {
+        ...question,
+        options: shuffledOptions.map((item) => item.option),
+        answer: shuffledAnswerIndex,
+      };
+    });
+
+    return shuffleArray(prepared);
+  }, [quizKey]);
 
   const currentQuestion = useMemo(() => questions[currentIndex], [questions, currentIndex]);
 
@@ -65,6 +84,7 @@ export default function Home() {
     setScore(0);
     setAnswered(false);
     setShowResult(false);
+    setQuizKey((prev) => prev + 1);
   };
 
   return (
